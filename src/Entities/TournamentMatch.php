@@ -6,6 +6,9 @@ use \Illuminate\Database\Eloquent\Model;
 
 class TournamentMatch extends Model
 {
+
+    protected $table = 'tournament_games';
+    
     /**
      * The attributes that are mass assignable.
      *
