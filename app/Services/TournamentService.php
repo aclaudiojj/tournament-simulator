@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use \Api\Services\TournamentService as TournamentSimulatorService;
+use Api\Services\TournamentService as TournamentSimulatorService;
 
 class TournamentService
 {
