@@ -24,7 +24,7 @@ class TournamentMatchRepository extends Repository
 
     public function clear()
     {
-        \DB::delete('delete from tournament_matches');
+        \DB::delete('delete from tournament_games');
     }
 
     /**
