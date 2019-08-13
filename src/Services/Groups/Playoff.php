@@ -104,7 +104,6 @@ class Playoff
                 'team_2' => $team2->team,
                 'team_1_score' => $team1Score,
                 'team_2_score' => $team2Score,
-                'group' => 'playoff',
                 'stage' => 'playoff',
                 'tournament_id' => $tournament->id,
                 

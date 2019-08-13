@@ -66,7 +66,6 @@ class Qualify
                     'team_2' => $team2->team,
                     'team_1_score' => $team1Score,
                     'team_2_score' => $team2Score,
-                    'group' => $groupName,
                     'stage' => $matchType,
                     'tournament_id' => $tournament->id,
                     

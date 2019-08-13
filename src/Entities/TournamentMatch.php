@@ -15,7 +15,7 @@ class TournamentMatch extends Model
      * @var array
      */
     protected $fillable = [
-        'tournament_id', 'team_1', 'team_2', 'team_1_score', 'team_2_score', 'stage', 'group'
+        'tournament_id', 'team_1', 'team_2', 'team_1_score', 'team_2_score', 'stage'
     ];
 
     /**
@@ -30,6 +30,7 @@ class TournamentMatch extends Model
         'team_2_score' => 'number',
         'stage' => 'string',
         'tournament_id' => 'number',
+
     ];
     
     public function tournament()
