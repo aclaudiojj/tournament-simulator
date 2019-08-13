@@ -57,7 +57,7 @@ class TournamentGroupRepository extends Repository
      * @param  \Illuminate\Database\Eloquent\Model $model
      * @return \Api\Http\Resources\ApiCollection
      */
-    public function resources($tournaments) : ApiResources
+    public function resources(Collection $tournaments) : ApiResources
     {
         return new TournamentGroupsResource($tournaments);
     }

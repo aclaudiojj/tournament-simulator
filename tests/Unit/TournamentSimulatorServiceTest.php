@@ -11,9 +11,9 @@ class TournamentSimulatorServiceTest extends UnitTestCase
     {
         parent::setUp();
 
-        // $this->otherDependencies = [
-        //     '' => $this->mockClass(\Illuminate\Http\Request::class),
-        // ];
+        $this->otherDependencies = [
+            'tournament' => $this->mockClass(\Api\Entities\Tournament::class),
+        ];
 
         $this->dependencies = [
             'repository' => $this->mockClass(\Api\Repositories\TournamentRepository::class),
@@ -65,21 +65,60 @@ class TournamentSimulatorServiceTest extends UnitTestCase
 
         $champion = 'Team 2';
 
+        $this->otherDependencies['tournament']
+            ->shouldReceive('getAttribute')
+            ->with('teams')
+            ->andReturn($numberOfTeams);
+
+        $this->dependencies['repository']
+            ->shouldReceive('find')
+            ->with(1)
+            ->andReturn($this->otherDependencies['tournament']);
+
         $this->dependencies['teamService']
             ->shouldReceive('createTeams')
             ->once()
             ->with($numberOfTeams)
+            ->andReturn($teams['qualify'])
+            ->shouldReceive('getTeamNames')
+            ->once()
+            ->with()
             ->andReturn($teams['qualify']);
 
         $this->dependencies['groupService']
             ->shouldReceive('createGroups')
             ->once()
-            ->with($tournament, $teams['qualify'])
+            ->with($this->otherDependencies['tournament'], $teams['qualify'])
             ->andReturn($groups)
             ->shouldReceive('teamsInPlayoffs')
             ->once()
-            ->with($tournament, $matches)
-            ->andReturn($teams['playoff']);
+            ->with($this->otherDependencies['tournament'], $matches)
+            ->andReturn($teams['playoff'])
+            ->shouldReceive('getTeamsInPlayoff')
+            ->once()
+            ->with()
+            ->andReturn($teams['playoff'])
+            ->shouldReceive('getGroupsAndTeams')
+            ->once()
+            ->with()
+            ->andReturn($groups);
+            
+        $this->dependencies['matchService']
+            ->shouldReceive('simulateQualify')
+            ->with($this->otherDependencies['tournament'], $groups)
+            ->andReturn($matches)
+            ->shouldReceive('simulatePlayoff')
+            ->with($this->otherDependencies['tournament'], $teams['playoff'])
+            ->andReturn($matches)
+            ->shouldReceive('getQualifyMatches')
+            ->with()
+            ->andReturn($matches['qualify'])
+            ->shouldReceive('getPlayoffMatches')
+            ->with()
+            ->andReturn($matches['playoff'])
+            ->shouldReceive('getChampion')
+            ->with()
+            ->andReturn($champion);
 
         $response = $this->testedClass->simulate(1);
 
@@ -87,82 +126,11 @@ class TournamentSimulatorServiceTest extends UnitTestCase
         $this->assertArrayHasKey('groups', $response);
         $this->assertArrayHasKey('matches', $response);
         $this->assertArrayHasKey('champion', $response);
+
+        $this->assertEquals($response['teams'], $teams);
+        $this->assertEquals($response['groups'], $groups);
+        $this->assertEquals($response['matches'], $matches);
+        $this->assertEquals($response['champion'], $champion);
     }
 
-    public function testIndex()
-    {
-        $this->dependencies['service']
-            ->shouldReceive('init')
-            ->once()
-            ->with($this->otherDependencies['request'])
-            ->andReturnSelf()
-            ->shouldReceive('index')
-            ->once()
-            ->with()
-            ->andReturn($this->otherDependencies['shoesResource']);
-
-        $return = $this->testedClass->index($this->otherDependencies['request']);
-
-        $this->assertEquals($return, $this->otherDependencies['shoesResource']);
-    }
-
-    public function testStore()
-    {
-        $this->dependencies['service']
-            ->shouldReceive('init')
-            ->once()
-            ->with($this->otherDependencies['request'])
-            ->andReturnSelf()
-            ->shouldReceive('store')
-            ->once()
-            ->with()
-            ->andReturn($this->otherDependencies['shoesResource']);
-
-        $return = $this->testedClass->store($this->otherDependencies['request']);
-
-        $this->assertEquals($return, $this->otherDependencies['shoesResource']);
-    }
-
-    public function testShow()
-    {
-        $this->dependencies['service']
-            ->shouldReceive('get')
-            ->once()
-            ->with(1)
-            ->andReturn($this->otherDependencies['shoesResource']);
-
-        $return = $this->testedClass->show(1);
-
-        $this->assertEquals($return, $this->otherDependencies['shoesResource']);
-    }
-
-    public function testUpdate()
-    {
-        $this->dependencies['service']
-            ->shouldReceive('init')
-            ->once()
-            ->with($this->otherDependencies['request'])
-            ->andReturnSelf()
-            ->shouldReceive('update')
-            ->once()
-            ->with(1)
-            ->andReturn($this->otherDependencies['shoesResource']);
-
-        $return = $this->testedClass->update($this->otherDependencies['request'], 1);
-
-        $this->assertEquals($return, $this->otherDependencies['shoesResource']);
-    }
-
-    public function testDestroy()
-    {
-        $this->dependencies['service']
-            ->shouldReceive('destroy')
-            ->once()
-            ->with(1)
-            ->andReturnNull();
-
-        $return = $this->testedClass->destroy(1);
-
-        $this->assertNull($return);
-    }
 }
